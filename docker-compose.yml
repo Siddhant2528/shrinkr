@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: shrinkr_user
+      POSTGRES_PASSWORD: shrinkr_pass
+      POSTGRES_DB: shrinkr_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://shrinkr_user:shrinkr_pass@db:5432/shrinkr_db
+      APP_NAME: Shrinkr
+      DEBUG: "True"
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:
