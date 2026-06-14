@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.core.config import get_settings
+from app.api import url as url_router
 
 settings = get_settings()
 
@@ -16,3 +17,5 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "ok", "app": settings.APP_NAME}
+
+app.include_router(url_router.router, tags=["URLs"])

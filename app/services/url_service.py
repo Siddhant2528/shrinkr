@@ -1,0 +1,29 @@
+import secrets
+import string
+from sqlalchemy.orm import Session
+from app.models.url import URL
+
+def generate_code(length: int = 6) -> str:
+    chars = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(chars) for _ in range(length))
+
+def generate_unique_code(db: Session, length: int = 6) -> str:
+    while True:
+        code = generate_code(length)
+        exists = db.query(URL).filter(URL.short_code == code).first()
+        if not exists:
+            return code
+
+def create_short_url(db: Session, original_url: str) -> URL:
+    short_code = generate_unique_code(db)
+
+    url_obj = URL(
+        original_url=original_url,
+        short_code=short_code,
+    )
+
+    db.add(url_obj)
+    db.commit()
+    db.refresh(url_obj)
+
+    return url_obj
