@@ -12,7 +12,14 @@ settings = get_settings()
 
 @router.post("/shorten", response_model=URLResponse)
 def shorten_url(data: URLCreate, db: Session = Depends(get_db)):
-    url_obj = url_service.create_short_url(db, str(data.original_url))
+    try:
+        url_obj = url_service.create_short_url(
+            db,
+            str(data.original_url),
+            data.custom_slug,
+        )
+    except url_service.SlugTakenError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     return URLResponse(
         short_code=url_obj.short_code,

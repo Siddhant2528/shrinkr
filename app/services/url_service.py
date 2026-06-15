@@ -3,6 +3,9 @@ import string
 from sqlalchemy.orm import Session
 from app.models.url import URL
 
+class SlugTakenError(Exception):
+    pass
+
 def generate_code(length: int = 6) -> str:
     chars = string.ascii_letters + string.digits
     return ''.join(secrets.choice(chars) for _ in range(length))
@@ -14,8 +17,14 @@ def generate_unique_code(db: Session, length: int = 6) -> str:
         if not exists:
             return code
 
-def create_short_url(db: Session, original_url: str) -> URL:
-    short_code = generate_unique_code(db)
+def create_short_url(db: Session, original_url: str, custom_slug: str | None = None) -> URL:
+    if custom_slug:
+        exists = db.query(URL).filter(URL.short_code == custom_slug).first()
+        if exists:
+            raise SlugTakenError(f"Slug '{custom_slug}' is already taken")
+        short_code = custom_slug
+    else:
+        short_code = generate_unique_code(db)
 
     url_obj = URL(
         original_url=original_url,
