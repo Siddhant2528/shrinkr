@@ -6,7 +6,8 @@ import re
 class URLCreate(BaseModel):
     original_url: HttpUrl
     custom_slug: Optional[str] = None
-
+    expires_in_days: Optional[int] = None
+    
     @field_validator('custom_slug')
     @classmethod
     def validate_slug(cls, v):
