@@ -1,6 +1,7 @@
 from logging.config import fileConfig
 from app.core.database import Base
 from app.models.url import URL
+from app.models.click import Click
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from sqlalchemy import create_engine
