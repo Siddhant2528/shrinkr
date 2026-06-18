@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException ,Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import get_settings
 from app.schemas.url import URLCreate, URLResponse
-from app.services import url_service
+from app.services import url_service,click_service
 from app.models.url import URL
 from datetime import datetime, timezone
 
@@ -31,7 +31,7 @@ def shorten_url(data: URLCreate, db: Session = Depends(get_db)):
     )
 
 @router.get("/{short_code}")
-def redirect_to_url(short_code: str, db: Session = Depends(get_db)):
+def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get_db)):
     url_obj = db.query(URL).filter(URL.short_code == short_code).first()
 
     if not url_obj or not url_obj.is_active:
@@ -41,5 +41,16 @@ def redirect_to_url(short_code: str, db: Session = Depends(get_db)):
         now = datetime.now(timezone.utc)
         if now > url_obj.expires_at:
             raise HTTPException(status_code=410, detail="This link has expired")
+
+    click_service.record_click(
+        db,
+        url_id=url_obj.id,
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent"),
+        referer=request.headers.get("referer"),
+    )
+
+    url_obj.clicks += 1
+    db.commit()
 
     return RedirectResponse(url=url_obj.original_url)
