@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.click import Click
 from user_agents import parse
+from app.services.geo_service import get_country
 
 def parse_user_agent(user_agent_string: str | None) -> tuple[str | None, str | None]:
     if not user_agent_string:
@@ -29,6 +30,7 @@ def record_click(
     referer: str | None,
 ):
     browser, device = parse_user_agent(user_agent)
+    country = get_country(ip_address)
 
     click = Click(
         url_id=url_id,
@@ -37,6 +39,7 @@ def record_click(
         referer=referer,
         browser=browser,
         device=device,
+        country=country,
     )
     db.add(click)
     db.commit()

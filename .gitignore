@@ -136,6 +136,8 @@ celerybeat.pid
 *.aof
 *.pid
 
+# GeoIP database
+data/*.mmdb
 # RabbitMQ
 mnesia/
 rabbitmq/
