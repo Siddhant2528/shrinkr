@@ -1,8 +1,8 @@
 from pydantic import BaseModel, HttpUrl, field_validator
-from typing import Optional
+from typing import Dict, Optional
 from datetime import datetime
 import re
-
+from typing import Dict
 class URLCreate(BaseModel):
     original_url: HttpUrl
     custom_slug: Optional[str] = None
@@ -25,3 +25,9 @@ class URLResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AnalyticsResponse(BaseModel):
+    short_code: str
+    total_clicks: int
+    clicks_by_country: Dict[str, int]
+    clicks_by_device: Dict[str, int]
