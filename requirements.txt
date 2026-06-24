@@ -8,3 +8,4 @@ pydantic-settings
 user-agents
 geoip2
 redis
+qrcode[pil]

@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException ,Request
+from fastapi import APIRouter, Depends, HTTPException ,Request, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import get_settings
 from app.schemas.url import URLCreate, URLResponse,AnalyticsResponse,TimeSeriesResponse
-from app.services import url_service,click_service,analytics_service,cache_service
+from app.services import url_service,click_service,analytics_service,cache_service,qr_service
 from app.models.url import URL
 from datetime import datetime, timezone
 
@@ -61,7 +61,17 @@ def get_link_analytics(short_code: str, db: Session = Depends(get_db)):
         clicks_by_browser=analytics["clicks_by_browser"],
     )
 
+@router.get("/qr/{short_code}")
+def get_qr_code(short_code: str, db: Session = Depends(get_db)):
+    url_obj = db.query(URL).filter(URL.short_code == short_code).first()
 
+    if not url_obj or not url_obj.is_active:
+        raise HTTPException(status_code=404, detail="Short URL not found")
+
+    short_url = f"{settings.BASE_URL}/{short_code}"
+    image_bytes = qr_service.get_qr_code(short_code, short_url)
+
+    return Response(content=image_bytes, media_type="image/png")
 
 @router.get("/{short_code}")
 def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get_db)):
