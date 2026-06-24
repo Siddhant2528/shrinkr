@@ -6,7 +6,8 @@ class Settings(BaseSettings):
     APP_NAME: str = "Shrinkr"
     DEBUG: bool = True
     BASE_URL: str = "http://localhost:8000"
-
+    REDIS_HOST: str = "redis"
+    REDIS_PORT: int = 6379
     class Config:
         env_file = ".env"
 

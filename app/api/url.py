@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import get_settings
 from app.schemas.url import URLCreate, URLResponse,AnalyticsResponse,TimeSeriesResponse
-from app.services import url_service,click_service,analytics_service
+from app.services import url_service,click_service,analytics_service,cache_service
 from app.models.url import URL
 from datetime import datetime, timezone
 
@@ -65,6 +65,18 @@ def get_link_analytics(short_code: str, db: Session = Depends(get_db)):
 
 @router.get("/{short_code}")
 def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get_db)):
+    cached = cache_service.get_cached_url(short_code)
+
+    if cached:
+        click_service.record_click(
+            db,
+            url_id=cached["url_id"],
+            ip_address=request.client.host,
+            user_agent=request.headers.get("user-agent"),
+            referer=request.headers.get("referer"),
+        )
+        return RedirectResponse(url=cached["original_url"])
+
     url_obj = db.query(URL).filter(URL.short_code == short_code).first()
 
     if not url_obj or not url_obj.is_active:
@@ -74,6 +86,8 @@ def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get
         now = datetime.now(timezone.utc)
         if now > url_obj.expires_at:
             raise HTTPException(status_code=410, detail="This link has expired")
+
+    cache_service.cache_url(short_code, url_obj.original_url, url_obj.id)
 
     click_service.record_click(
         db,
