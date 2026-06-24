@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import get_settings
-from app.schemas.url import URLCreate, URLResponse,AnalyticsResponse
+from app.schemas.url import URLCreate, URLResponse,AnalyticsResponse,TimeSeriesResponse
 from app.services import url_service,click_service,analytics_service
 from app.models.url import URL
 from datetime import datetime, timezone
@@ -30,6 +30,20 @@ def shorten_url(data: URLCreate, db: Session = Depends(get_db)):
         created_at=url_obj.created_at,
     )
 
+@router.get("/analytics/{short_code}/timeseries", response_model=TimeSeriesResponse)
+def get_timeseries(
+    short_code: str,
+    days: int = 30,
+    db: Session = Depends(get_db)
+):
+    url_obj = db.query(URL).filter(URL.short_code == short_code).first()
+
+    if not url_obj:
+        raise HTTPException(status_code=404, detail="Short URL not found")
+
+    return analytics_service.get_click_timeseries(db, url_obj.id, days)
+
+
 @router.get("/analytics/{short_code}", response_model=AnalyticsResponse)
 def get_link_analytics(short_code: str, db: Session = Depends(get_db)):
     url_obj = db.query(URL).filter(URL.short_code == short_code).first()
@@ -44,7 +58,10 @@ def get_link_analytics(short_code: str, db: Session = Depends(get_db)):
         total_clicks=analytics["total_clicks"],
         clicks_by_country=analytics["clicks_by_country"],
         clicks_by_device=analytics["clicks_by_device"],
+        clicks_by_browser=analytics["clicks_by_browser"],
     )
+
+
 
 @router.get("/{short_code}")
 def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get_db)):

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, HttpUrl, field_validator
-from typing import Dict, Optional
+from typing import Dict, Optional,List
 from datetime import datetime
 import re
 from typing import Dict
@@ -26,8 +26,16 @@ class URLResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class ClicksPerDay(BaseModel):
+    date: str
+    clicks: int
+
+class TimeSeriesResponse(BaseModel):
+    timeseries: List[ClicksPerDay]
+
 class AnalyticsResponse(BaseModel):
     short_code: str
     total_clicks: int
     clicks_by_country: Dict[str, int]
     clicks_by_device: Dict[str, int]
+    clicks_by_browser: Dict[str, int]
