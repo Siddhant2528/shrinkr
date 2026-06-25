@@ -3,10 +3,12 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import get_settings
-from app.schemas.url import URLCreate, URLResponse,AnalyticsResponse,TimeSeriesResponse
-from app.services import url_service,click_service,analytics_service,cache_service,qr_service
+from app.schemas.url import URLCreate, URLResponse,AnalyticsResponse,TimeSeriesResponse,APIKeyCreate, APIKeyResponse
+from app.services import url_service,click_service,analytics_service,cache_service,qr_service, api_key_service
 from app.models.url import URL
 from datetime import datetime, timezone
+from app.core.auth import require_api_key
+from app.models.api_key import APIKey as APIKeyModel
 
 router = APIRouter()
 settings = get_settings()
@@ -72,6 +74,39 @@ def get_qr_code(short_code: str, db: Session = Depends(get_db)):
     image_bytes = qr_service.get_qr_code(short_code, short_url)
 
     return Response(content=image_bytes, media_type="image/png")
+
+@router.post("/api-keys", response_model=APIKeyResponse)
+def create_api_key(data: APIKeyCreate, db: Session = Depends(get_db)):
+    api_key_obj, raw_key = api_key_service.create_api_key(db, data.name)
+    return APIKeyResponse(
+        id=api_key_obj.id,
+        name=api_key_obj.name,
+        key=raw_key,
+        created_at=api_key_obj.created_at,
+    )
+
+@router.post("/shorten/protected", response_model=URLResponse)
+def shorten_url_protected(
+    data: URLCreate,
+    db: Session = Depends(get_db),
+    api_key: APIKeyModel = Depends(require_api_key),
+):
+    try:
+        url_obj = url_service.create_short_url(
+            db,
+            str(data.original_url),
+            data.custom_slug,
+            data.expires_in_days,
+        )
+    except url_service.SlugTakenError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return URLResponse(
+        short_code=url_obj.short_code,
+        original_url=url_obj.original_url,
+        short_url=f"{settings.BASE_URL}/{url_obj.short_code}",
+        created_at=url_obj.created_at,
+    )
 
 @router.get("/{short_code}")
 def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get_db)):
