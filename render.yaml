@@ -3,32 +3,36 @@ services:
     name: shrinkr-api
     runtime: docker
     dockerfilePath: ./Dockerfile
+
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: shrinkr-db
           property: connectionString
+
       - key: REDIS_HOST
         fromService:
           name: shrinkr-redis
-          type: redis
           property: host
+
       - key: REDIS_PORT
         fromService:
           name: shrinkr-redis
-          type: redis
           property: port
+
       - key: APP_NAME
         value: Shrinkr
+
       - key: BASE_URL
         value: https://shrinkr-api.onrender.com
+
       - key: DEBUG
         value: "False"
+
+  - type: redis
+    name: shrinkr-redis
 
 databases:
   - name: shrinkr-db
     databaseName: shrinkr_db
     user: shrinkr_user
-
-  - name: shrinkr-redis
-    type: redis
