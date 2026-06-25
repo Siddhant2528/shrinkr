@@ -9,3 +9,4 @@ user-agents
 geoip2
 redis
 qrcode[pil]
+httpx
