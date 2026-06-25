@@ -3,8 +3,8 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import get_settings
-from app.schemas.url import URLCreate, URLResponse,AnalyticsResponse,TimeSeriesResponse,APIKeyCreate, APIKeyResponse
-from app.services import url_service,click_service,analytics_service,cache_service,qr_service, api_key_service
+from app.schemas.url import URLCreate, URLResponse,AnalyticsResponse,TimeSeriesResponse,APIKeyCreate, APIKeyResponse,DashboardResponse, DashboardSummary, TopLink, RecentClick
+from app.services import url_service,click_service,analytics_service,cache_service,qr_service, api_key_service,dashboard_service
 from app.models.url import URL
 from datetime import datetime, timezone
 from app.core.auth import require_api_key
@@ -107,6 +107,42 @@ def shorten_url_protected(
         short_url=f"{settings.BASE_URL}/{url_obj.short_code}",
         created_at=url_obj.created_at,
     )
+
+@router.get("/dashboard", response_model=DashboardResponse)
+def get_dashboard(db: Session = Depends(get_db)):
+    summary = dashboard_service.get_summary(db)
+    top_links = dashboard_service.get_top_links(db)
+    countries = dashboard_service.get_country_breakdown(db)
+    devices = dashboard_service.get_device_breakdown(db)
+    recent = dashboard_service.get_recent_clicks(db)
+
+    return DashboardResponse(
+        summary=DashboardSummary(**summary),
+        top_links=[TopLink(**link) for link in top_links],
+        clicks_by_country=countries,
+        clicks_by_device=devices,
+        recent_clicks=[RecentClick(**click) for click in recent],
+    )
+
+@router.get("/dashboard/summary", response_model=DashboardSummary)
+def get_summary(db: Session = Depends(get_db)):
+    return DashboardSummary(**dashboard_service.get_summary(db))
+
+@router.get("/dashboard/countries")
+def get_countries(db: Session = Depends(get_db)):
+    return dashboard_service.get_country_breakdown(db)
+
+@router.get("/dashboard/devices")
+def get_devices(db: Session = Depends(get_db)):
+    return dashboard_service.get_device_breakdown(db)
+
+@router.get("/dashboard/top-links")
+def get_top_links(db: Session = Depends(get_db)):
+    return dashboard_service.get_top_links(db)
+
+@router.get("/dashboard/recent")
+def get_recent(db: Session = Depends(get_db)):
+    return dashboard_service.get_recent_clicks(db)
 
 @router.get("/{short_code}")
 def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get_db)):
