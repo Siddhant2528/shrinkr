@@ -12,11 +12,13 @@ services:
 
       - key: REDIS_HOST
         fromService:
+          type: keyvalue
           name: shrinkr-redis
           property: host
 
       - key: REDIS_PORT
         fromService:
+          type: keyvalue
           name: shrinkr-redis
           property: port
 
@@ -29,8 +31,9 @@ services:
       - key: DEBUG
         value: "False"
 
-  - type: redis
+  - type: keyvalue
     name: shrinkr-redis
+    ipAllowList: []
 
 databases:
   - name: shrinkr-db
