@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     BASE_URL: str = "http://localhost:8000"
     REDIS_HOST: str = "redis"
     REDIS_PORT: int = 6379
+    REDIS_PASSWORD: str = ""
+    REDIS_SSL: bool = False
     class Config:
         env_file = ".env"
 
