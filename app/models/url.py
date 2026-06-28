@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 from sqlalchemy.sql import func
 from app.core.database import Base
 from sqlalchemy.orm import relationship
@@ -14,4 +14,7 @@ class URL(Base):
     expires_at = Column(DateTime(timezone=True), nullable=True)
     clicks = Column(Integer, default=0)
 
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
     click_events = relationship("Click", back_populates="url")
+    owner = relationship("User", back_populates="urls")

@@ -99,3 +99,20 @@ class UserResponse(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"    
+
+class URLListResponse(BaseModel):
+    id: int
+    short_code: str
+    original_url: str
+    short_url: str
+    clicks: int
+    is_active: bool
+    created_at: datetime
+    expires_at: datetime | None
+
+    class Config:
+        from_attributes = True    
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str        

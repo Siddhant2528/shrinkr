@@ -3,24 +3,30 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import get_settings
-from app.schemas.url import URLCreate, URLResponse,AnalyticsResponse,TimeSeriesResponse,APIKeyCreate, APIKeyResponse,DashboardResponse, DashboardSummary, TopLink, RecentClick
+from app.schemas.url import URLCreate,URLListResponse, URLResponse,AnalyticsResponse,TimeSeriesResponse,APIKeyCreate, APIKeyResponse,DashboardResponse, DashboardSummary, TopLink, RecentClick
 from app.services import url_service,click_service,analytics_service,cache_service,qr_service, api_key_service,dashboard_service
 from app.models.url import URL
 from datetime import datetime, timezone
-from app.core.auth import require_api_key
+from app.core.auth import require_api_key,get_current_user, get_current_admin, get_optional_user
 from app.models.api_key import APIKey as APIKeyModel
+from app.models.user import User
 
 router = APIRouter()
 settings = get_settings()
 
 @router.post("/shorten", response_model=URLResponse)
-def shorten_url(data: URLCreate, db: Session = Depends(get_db)):
+def shorten_url(
+    data: URLCreate,
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(get_optional_user),
+):
     try:
         url_obj = url_service.create_short_url(
             db,
             str(data.original_url),
             data.custom_slug,
             data.expires_in_days,
+            user_id=current_user.id if current_user else None,
         )
     except url_service.SlugTakenError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -32,26 +38,95 @@ def shorten_url(data: URLCreate, db: Session = Depends(get_db)):
         created_at=url_obj.created_at,
     )
 
-@router.get("/analytics/{short_code}/timeseries", response_model=TimeSeriesResponse)
-def get_timeseries(
+@router.get("/my-links", response_model=list[URLListResponse])
+def get_my_links(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    urls = (
+        db.query(URL)
+        .filter(URL.user_id == current_user.id)
+        .order_by(URL.created_at.desc())
+        .all()
+    )
+    return [
+        URLListResponse(
+            id=url.id,
+            short_code=url.short_code,
+            original_url=url.original_url,
+            short_url=f"{settings.BASE_URL}/{url.short_code}",
+            clicks=url.clicks,
+            is_active=url.is_active,
+            created_at=url.created_at,
+            expires_at=url.expires_at,
+        )
+        for url in urls
+    ]
+
+@router.delete("/my-links/{short_code}")
+def delete_my_link(
     short_code: str,
-    days: int = 30,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    url_obj = db.query(URL).filter(
+        URL.short_code == short_code,
+        URL.user_id == current_user.id,
+    ).first()
+
+    if not url_obj:
+        raise HTTPException(status_code=404, detail="Link not found or not yours")
+
+    url_obj.is_active = False
+    db.commit()
+    return {"message": f"Link '{short_code}' deactivated successfully"}
+
+@router.patch("/my-links/{short_code}", response_model=URLListResponse)
+def update_my_link(
+    short_code: str,
+    data: URLCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    url_obj = db.query(URL).filter(
+        URL.short_code == short_code,
+        URL.user_id == current_user.id,
+    ).first()
+
+    if not url_obj:
+        raise HTTPException(status_code=404, detail="Link not found or not yours")
+
+    url_obj.original_url = str(data.original_url)
+    db.commit()
+    db.refresh(url_obj)
+
+    from app.services.cache_service import invalidate_url
+    invalidate_url(short_code)
+
+    return URLListResponse(
+        id=url_obj.id,
+        short_code=url_obj.short_code,
+        original_url=url_obj.original_url,
+        short_url=f"{settings.BASE_URL}/{url_obj.short_code}",
+        clicks=url_obj.clicks,
+        is_active=url_obj.is_active,
+        created_at=url_obj.created_at,
+        expires_at=url_obj.expires_at,
+    )
+
+@router.get("/analytics/{short_code}", response_model=AnalyticsResponse)
+def get_link_analytics(
+    short_code: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     url_obj = db.query(URL).filter(URL.short_code == short_code).first()
 
     if not url_obj:
         raise HTTPException(status_code=404, detail="Short URL not found")
 
-    return analytics_service.get_click_timeseries(db, url_obj.id, days)
-
-
-@router.get("/analytics/{short_code}", response_model=AnalyticsResponse)
-def get_link_analytics(short_code: str, db: Session = Depends(get_db)):
-    url_obj = db.query(URL).filter(URL.short_code == short_code).first()
-
-    if not url_obj:
-        raise HTTPException(status_code=404, detail="Short URL not found")
+    if url_obj.user_id and url_obj.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view these analytics")
 
     analytics = analytics_service.get_analytics(db, url_obj.id)
 
@@ -63,6 +138,22 @@ def get_link_analytics(short_code: str, db: Session = Depends(get_db)):
         clicks_by_browser=analytics["clicks_by_browser"],
     )
 
+@router.get("/analytics/{short_code}/timeseries", response_model=TimeSeriesResponse)
+def get_timeseries(
+    short_code: str,
+    days: int = 30,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    url_obj = db.query(URL).filter(URL.short_code == short_code).first()
+
+    if not url_obj:
+        raise HTTPException(status_code=404, detail="Short URL not found")
+
+    if url_obj.user_id and url_obj.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view these analytics")
+
+    return analytics_service.get_click_timeseries(db, url_obj.id, days)
 @router.get("/qr/{short_code}")
 def get_qr_code(short_code: str, db: Session = Depends(get_db)):
     url_obj = db.query(URL).filter(URL.short_code == short_code).first()
@@ -89,7 +180,7 @@ def create_api_key(data: APIKeyCreate, db: Session = Depends(get_db)):
 def shorten_url_protected(
     data: URLCreate,
     db: Session = Depends(get_db),
-    api_key: APIKeyModel = Depends(require_api_key),
+    current_user: User = Depends(get_current_user),
 ):
     try:
         url_obj = url_service.create_short_url(
@@ -97,6 +188,7 @@ def shorten_url_protected(
             str(data.original_url),
             data.custom_slug,
             data.expires_in_days,
+            user_id=current_user.id,
         )
     except url_service.SlugTakenError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -109,7 +201,10 @@ def shorten_url_protected(
     )
 
 @router.get("/dashboard", response_model=DashboardResponse)
-def get_dashboard(db: Session = Depends(get_db)):
+def get_dashboard(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin),
+):
     summary = dashboard_service.get_summary(db)
     top_links = dashboard_service.get_top_links(db)
     countries = dashboard_service.get_country_breakdown(db)
@@ -125,23 +220,38 @@ def get_dashboard(db: Session = Depends(get_db)):
     )
 
 @router.get("/dashboard/summary", response_model=DashboardSummary)
-def get_summary(db: Session = Depends(get_db)):
+def get_summary(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin),
+):
     return DashboardSummary(**dashboard_service.get_summary(db))
 
 @router.get("/dashboard/countries")
-def get_countries(db: Session = Depends(get_db)):
+def get_countries(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin),
+):
     return dashboard_service.get_country_breakdown(db)
 
 @router.get("/dashboard/devices")
-def get_devices(db: Session = Depends(get_db)):
+def get_devices(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin),
+):
     return dashboard_service.get_device_breakdown(db)
 
 @router.get("/dashboard/top-links")
-def get_top_links(db: Session = Depends(get_db)):
+def get_top_links(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin),
+):
     return dashboard_service.get_top_links(db)
 
 @router.get("/dashboard/recent")
-def get_recent(db: Session = Depends(get_db)):
+def get_recent(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin),
+):
     return dashboard_service.get_recent_clicks(db)
 
 @router.get("/{short_code}")

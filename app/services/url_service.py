@@ -23,6 +23,7 @@ def create_short_url(
     original_url: str,
     custom_slug: str | None = None,
     expires_in_days: int | None = None,
+    user_id: int | None = None,
 ) -> URL:
     if custom_slug:
         exists = db.query(URL).filter(URL.short_code == custom_slug).first()
@@ -40,10 +41,10 @@ def create_short_url(
         original_url=original_url,
         short_code=short_code,
         expires_at=expires_at,
+        user_id=user_id,
     )
 
     db.add(url_obj)
     db.commit()
     db.refresh(url_obj)
-
     return url_obj

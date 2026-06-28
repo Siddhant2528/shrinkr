@@ -14,3 +14,4 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+    urls = relationship("URL", back_populates="owner")
