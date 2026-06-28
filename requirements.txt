@@ -10,3 +10,7 @@ geoip2
 redis
 qrcode[pil]
 httpx
+python-jose[cryptography]
+passlib
+bcrypt==4.0.1
+python-multipart

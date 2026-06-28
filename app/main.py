@@ -4,6 +4,7 @@ from app.api import url as url_router
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.core.middleware import rate_limit_middleware
+from app.api import auth as auth_router
 
 settings = get_settings()
 
@@ -34,3 +35,4 @@ def health():
     return {"status": "ok", "app": settings.APP_NAME}
 
 app.include_router(url_router.router, tags=["URLs"])
+app.include_router(auth_router.router)

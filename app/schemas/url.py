@@ -80,3 +80,22 @@ class DashboardResponse(BaseModel):
     clicks_by_country: Dict[str, int]
     clicks_by_device: Dict[str, int]
     recent_clicks: list[RecentClick]    
+
+class UserCreate(BaseModel):
+    email: str
+    username: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    username: str
+    is_admin: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"    
