@@ -21,7 +21,7 @@ RUN python -c "import geoip2; print('geoip2 ok')"
 RUN chmod +x startup.sh
 
 # Run as a non-root user for security
-RUN adduser --disabled-password --no-create-home shrinkruser
+RUN adduser --disabled-password --no-create-home --gecos "" shrinkruser
 USER shrinkruser
 
 # Health check — polls /health every 30s, 3 retries, 30s grace period for startup
