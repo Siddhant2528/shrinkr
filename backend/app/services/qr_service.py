@@ -4,6 +4,7 @@ from app.core.redis import redis_client
 
 QR_CACHE_TTL = 86400
 
+
 def generate_qr_bytes(url: str) -> bytes:
     qr = qrcode.QRCode(
         version=1,
@@ -20,6 +21,7 @@ def generate_qr_bytes(url: str) -> bytes:
     img.save(buffer, format="PNG")
     buffer.seek(0)
     return buffer.read()
+
 
 def get_qr_code(short_code: str, short_url: str) -> bytes:
     cache_key = f"qr:{short_code}"

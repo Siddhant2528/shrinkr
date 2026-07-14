@@ -36,7 +36,8 @@ def _build_url_list_response(url: URL) -> URLListResponse:
         is_favorite=url.is_favorite,
         created_at=url.created_at,
         expires_at=url.expires_at,
-        tags=[{"id": t.id, "name": t.name, "color": t.color} for t in url.tags],
+        tags=[{"id": t.id, "name": t.name, "color": t.color}
+              for t in url.tags],
     )
 
 
@@ -49,7 +50,8 @@ def shorten_url(
     current_user: User | None = Depends(get_optional_user),
 ):
     if current_user and not current_user.is_verified:
-        raise HTTPException(status_code=403, detail="Email verification required")
+        raise HTTPException(
+            status_code=403, detail="Email verification required")
     try:
         url_obj = url_service.create_short_url(
             db,
@@ -105,7 +107,8 @@ def get_my_links(
     if search:
         search_term = f"%{search}%"
         query = query.filter(
-            (URL.short_code.ilike(search_term)) | (URL.original_url.ilike(search_term))
+            (URL.short_code.ilike(search_term)) | (
+                URL.original_url.ilike(search_term))
         )
 
     # Sorting
@@ -143,7 +146,8 @@ def archive_my_link(
     ).first()
 
     if not url_obj:
-        raise HTTPException(status_code=404, detail="Link not found or not yours")
+        raise HTTPException(
+            status_code=404, detail="Link not found or not yours")
 
     url_obj.is_archived = not url_obj.is_archived
     url_obj.is_active = not url_obj.is_archived
@@ -170,7 +174,8 @@ def toggle_favorite(
     ).first()
 
     if not url_obj:
-        raise HTTPException(status_code=404, detail="Link not found or not yours")
+        raise HTTPException(
+            status_code=404, detail="Link not found or not yours")
 
     url_obj.is_favorite = not url_obj.is_favorite
     db.commit()
@@ -194,7 +199,8 @@ def update_my_link(
     ).first()
 
     if not url_obj:
-        raise HTTPException(status_code=404, detail="Link not found or not yours")
+        raise HTTPException(
+            status_code=404, detail="Link not found or not yours")
 
     url_obj.original_url = str(data.original_url)
     db.commit()
@@ -219,7 +225,8 @@ def get_link_analytics(
         raise HTTPException(status_code=404, detail="Short URL not found")
 
     if url_obj.user_id and url_obj.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to view these analytics")
+        raise HTTPException(
+            status_code=403, detail="Not authorized to view these analytics")
 
     analytics = analytics_service.get_analytics(db, url_obj.id)
 
@@ -245,7 +252,8 @@ def get_timeseries(
         raise HTTPException(status_code=404, detail="Short URL not found")
 
     if url_obj.user_id and url_obj.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized to view these analytics")
+        raise HTTPException(
+            status_code=403, detail="Not authorized to view these analytics")
 
     return analytics_service.get_click_timeseries(db, url_obj.id, days)
 
@@ -282,8 +290,10 @@ def create_api_key(
     current_user: User = Depends(get_current_user),
 ):
     if not current_user.is_verified:
-        raise HTTPException(status_code=403, detail="Email verification required")
-    api_key_obj, raw_key = api_key_service.create_api_key(db, data.name, current_user.id)
+        raise HTTPException(
+            status_code=403, detail="Email verification required")
+    api_key_obj, raw_key = api_key_service.create_api_key(
+        db, data.name, current_user.id)
     return APIKeyResponse(
         id=api_key_obj.id,
         name=api_key_obj.name,
@@ -300,7 +310,8 @@ def revoke_api_key(
 ):
     api_key = api_key_service.revoke_key(db, key_id, current_user.id)
     if not api_key:
-        raise HTTPException(status_code=404, detail="API key not found or not yours")
+        raise HTTPException(
+            status_code=404, detail="API key not found or not yours")
     return {"message": f"API key '{api_key.name}' revoked successfully"}
 
 
@@ -420,7 +431,8 @@ def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get
     if url_obj.expires_at:
         now = datetime.now(timezone.utc)
         if now > url_obj.expires_at:
-            raise HTTPException(status_code=410, detail="This link has expired")
+            raise HTTPException(
+                status_code=410, detail="This link has expired")
 
     cache_service.cache_url(short_code, url_obj.original_url, url_obj.id)
 

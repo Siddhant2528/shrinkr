@@ -3,6 +3,7 @@ from app.models.click import Click
 from user_agents import parse
 from app.services.geo_service import get_country
 
+
 def parse_user_agent(user_agent_string: str | None) -> tuple[str | None, str | None]:
     if not user_agent_string:
         return None, None
@@ -21,6 +22,7 @@ def parse_user_agent(user_agent_string: str | None) -> tuple[str | None, str | N
         device = "Other"
 
     return browser, device
+
 
 def record_click(
     db: Session,

@@ -7,9 +7,11 @@ In development  (DEBUG=True): Human-readable coloured output, level=DEBUG
 import logging
 import sys
 
+
 def setup_logging(debug: bool = False, log_level: str = "INFO") -> None:
     """Configure root logger. Call once at application startup."""
-    level = logging.DEBUG if debug else getattr(logging, log_level.upper(), logging.INFO)
+    level = logging.DEBUG if debug else getattr(
+        logging, log_level.upper(), logging.INFO)
 
     if debug:
         fmt = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
@@ -32,6 +34,7 @@ def setup_logging(debug: bool = False, log_level: str = "INFO") -> None:
     if not debug:
         logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
         logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+
 
 def get_logger(name: str) -> logging.Logger:
     """Convenience wrapper — use in place of logging.getLogger()."""

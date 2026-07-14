@@ -37,9 +37,11 @@ def add_domain(
 ):
     """Register a new custom domain and receive the DNS verification token."""
     # Check for duplicate
-    existing = db.query(CustomDomain).filter(CustomDomain.domain == data.domain.lower().strip()).first()
+    existing = db.query(CustomDomain).filter(
+        CustomDomain.domain == data.domain.lower().strip()).first()
     if existing:
-        raise HTTPException(status_code=409, detail="Domain already registered")
+        raise HTTPException(
+            status_code=409, detail="Domain already registered")
 
     return domain_service.create_domain(db, current_user.id, data.domain, data.verification_type)
 
@@ -60,7 +62,8 @@ def delete_domain(
 ):
     deleted = domain_service.delete_domain(db, domain_id, current_user.id)
     if not deleted:
-        raise HTTPException(status_code=404, detail="Domain not found or not yours")
+        raise HTTPException(
+            status_code=404, detail="Domain not found or not yours")
 
 
 @router.post("/{domain_id}/verify", response_model=DomainResponse)
@@ -75,7 +78,8 @@ def verify_domain(
     """
     domain_obj = domain_service.verify_domain(db, domain_id, current_user.id)
     if domain_obj is None:
-        raise HTTPException(status_code=404, detail="Domain not found or not yours")
+        raise HTTPException(
+            status_code=404, detail="Domain not found or not yours")
     if not domain_obj.is_verified:
         raise HTTPException(
             status_code=422,

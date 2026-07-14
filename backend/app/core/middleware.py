@@ -24,7 +24,8 @@ async def rate_limit_middleware(request: Request, call_next):
         if is_rate_limited(identifier, limit=limit, window_seconds=60):
             return JSONResponse(
                 status_code=429,
-                content={"detail": "Rate limit exceeded. Try again in 60 seconds."},
+                content={
+                    "detail": "Rate limit exceeded. Try again in 60 seconds."},
                 headers={"Retry-After": "60"},
             )
 

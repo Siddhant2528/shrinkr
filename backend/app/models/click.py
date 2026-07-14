@@ -3,6 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
+
 class Click(Base):
     __tablename__ = "clicks"
 

@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.models.click import Click
-from app.models.url import URL
 from datetime import datetime, timedelta, timezone
+
 
 def get_analytics(db: Session, url_id: int) -> dict:
     total_clicks = (
@@ -51,6 +51,7 @@ def get_analytics(db: Session, url_id: int) -> dict:
         "clicks_by_browser": clicks_by_browser,
     }
 
+
 def get_click_timeseries(db: Session, url_id: int, days: int = 30) -> dict:
     since = datetime.now(timezone.utc) - timedelta(days=days)
 
@@ -76,4 +77,4 @@ def get_click_timeseries(db: Session, url_id: int, days: int = 30) -> dict:
             "clicks": result_map.get(date, 0)
         })
 
-    return {"timeseries": timeseries}   
+    return {"timeseries": timeseries}

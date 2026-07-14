@@ -3,6 +3,7 @@ from sqlalchemy.sql import func
 from app.core.database import Base
 from sqlalchemy.orm import relationship
 
+
 class URL(Base):
     __tablename__ = "urls"
 

@@ -102,7 +102,8 @@ def verify_domain(db: Session, domain_id: int, user_id: int) -> CustomDomain | N
         return None
 
     if domain_obj.verification_type == VerificationType.txt:
-        verified = _check_txt_record(domain_obj.domain, domain_obj.verification_token)
+        verified = _check_txt_record(
+            domain_obj.domain, domain_obj.verification_token)
     else:
         verified = _check_cname_record(domain_obj.domain)
 

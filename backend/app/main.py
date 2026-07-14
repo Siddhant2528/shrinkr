@@ -3,7 +3,6 @@ from app.core.config import get_settings
 from app.core.logging_config import setup_logging, get_logger
 from app.api import url as url_router
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from app.core.middleware import rate_limit_middleware, custom_domain_middleware, init_primary_host
@@ -38,6 +37,7 @@ app = FastAPI(
 )
 
 # ─── Security headers middleware ──────────────────────────────────────────────
+
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
@@ -89,13 +89,16 @@ app.add_middleware(
 
 # ─── Routes ──────────────────────────────────────────────────────────────────
 
+
 @app.get("/")
 def root():
     return {"message": f"Welcome to {settings.APP_NAME}"}
 
+
 @app.get("/health")
 def health():
     return {"status": "ok", "app": settings.APP_NAME}
+
 
 app.include_router(url_router.router, tags=["URLs"])
 app.include_router(auth_router.router)

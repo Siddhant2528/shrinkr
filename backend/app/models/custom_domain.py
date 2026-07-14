@@ -17,7 +17,8 @@ class CustomDomain(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     domain = Column(String, unique=True, nullable=False, index=True)
     verification_token = Column(String, nullable=False)
-    verification_type = Column(Enum(VerificationType), default=VerificationType.txt, nullable=False)
+    verification_type = Column(
+        Enum(VerificationType), default=VerificationType.txt, nullable=False)
     is_verified = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     verified_at = Column(DateTime(timezone=True), nullable=True)

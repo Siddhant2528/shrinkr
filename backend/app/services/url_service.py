@@ -4,12 +4,15 @@ from sqlalchemy.orm import Session
 from app.models.url import URL
 from datetime import datetime, timezone, timedelta
 
+
 class SlugTakenError(Exception):
     pass
+
 
 def generate_code(length: int = 6) -> str:
     chars = string.ascii_letters + string.digits
     return ''.join(secrets.choice(chars) for _ in range(length))
+
 
 def generate_unique_code(db: Session, length: int = 6) -> str:
     while True:
@@ -17,6 +20,7 @@ def generate_unique_code(db: Session, length: int = 6) -> str:
         exists = db.query(URL).filter(URL.short_code == code).first()
         if not exists:
             return code
+
 
 def create_short_url(
     db: Session,
@@ -35,7 +39,8 @@ def create_short_url(
 
     expires_at = None
     if expires_in_days is not None:
-        expires_at = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
+        expires_at = datetime.now(timezone.utc) + \
+            timedelta(days=expires_in_days)
 
     url_obj = URL(
         original_url=original_url,

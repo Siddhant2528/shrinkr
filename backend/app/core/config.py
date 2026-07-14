@@ -9,6 +9,7 @@ _INSECURE_SECRET_KEYS = {
     "change-me",
 }
 
+
 class Settings(BaseSettings):
     DATABASE_URL: str
     APP_NAME: str = "Shrinkr"
@@ -43,6 +44,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         extra = "ignore"
+
 
 @lru_cache()
 def get_settings() -> Settings:

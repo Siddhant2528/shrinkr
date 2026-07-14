@@ -53,7 +53,8 @@ def delete_tag(
 ):
     deleted = tag_service.delete_tag(db, tag_id, current_user.id)
     if not deleted:
-        raise HTTPException(status_code=404, detail="Tag not found or not yours")
+        raise HTTPException(
+            status_code=404, detail="Tag not found or not yours")
 
 
 @router.put("/links/{short_code}", response_model=list[TagResponse])
@@ -68,6 +69,8 @@ def set_link_tags(
         URL.user_id == current_user.id,
     ).first()
     if not url_obj:
-        raise HTTPException(status_code=404, detail="Link not found or not yours")
-    url_obj = tag_service.set_link_tags(db, url_obj, data.tag_ids, current_user.id)
+        raise HTTPException(
+            status_code=404, detail="Link not found or not yours")
+    url_obj = tag_service.set_link_tags(
+        db, url_obj, data.tag_ids, current_user.id)
     return url_obj.tags

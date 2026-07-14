@@ -4,6 +4,7 @@ from app.models.url import URL
 from app.models.click import Click
 from datetime import datetime, timezone, timedelta
 
+
 def get_summary(db: Session) -> dict:
     url_stats = db.query(
         func.count(URL.id),
@@ -22,7 +23,7 @@ def get_summary(db: Session) -> dict:
 
     active_urls = (
         db.query(func.count(URL.id))
-        .filter(URL.is_active == True)
+        .filter(URL.is_active)
         .scalar() or 0
     )
 
@@ -33,10 +34,11 @@ def get_summary(db: Session) -> dict:
         "active_urls": active_urls,
     }
 
+
 def get_top_links(db: Session, limit: int = 10) -> list:
     results = (
         db.query(URL)
-        .filter(URL.is_active == True)
+        .filter(URL.is_active)
         .order_by(URL.clicks.desc())
         .limit(limit)
         .all()
@@ -51,6 +53,7 @@ def get_top_links(db: Session, limit: int = 10) -> list:
         for url in results
     ]
 
+
 def get_country_breakdown(db: Session) -> dict:
     results = (
         db.query(Click.country, func.count(Click.id))
@@ -64,6 +67,7 @@ def get_country_breakdown(db: Session) -> dict:
         for country, count in results
     }
 
+
 def get_device_breakdown(db: Session) -> dict:
     results = (
         db.query(Click.device, func.count(Click.id))
@@ -75,6 +79,7 @@ def get_device_breakdown(db: Session) -> dict:
         (device if device else "Unknown"): count
         for device, count in results
     }
+
 
 def get_recent_clicks(db: Session, limit: int = 10) -> list:
     results = (

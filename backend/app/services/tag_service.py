@@ -16,7 +16,8 @@ def create_tag(db: Session, user_id: int, name: str, color: str = "#6366f1") -> 
 
 
 def delete_tag(db: Session, tag_id: int, user_id: int) -> bool:
-    tag = db.query(Tag).filter(Tag.id == tag_id, Tag.user_id == user_id).first()
+    tag = db.query(Tag).filter(Tag.id == tag_id,
+                               Tag.user_id == user_id).first()
     if not tag:
         return False
     db.delete(tag)
@@ -26,7 +27,8 @@ def delete_tag(db: Session, tag_id: int, user_id: int) -> bool:
 
 def set_link_tags(db: Session, url_obj: URL, tag_ids: list[int], user_id: int) -> URL:
     """Replace all tags on a link with the supplied tag_ids (must belong to user)."""
-    tags = db.query(Tag).filter(Tag.id.in_(tag_ids), Tag.user_id == user_id).all()
+    tags = db.query(Tag).filter(Tag.id.in_(tag_ids),
+                                Tag.user_id == user_id).all()
     url_obj.tags = tags
     db.commit()
     db.refresh(url_obj)

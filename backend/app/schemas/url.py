@@ -28,7 +28,8 @@ class URLCreate(BaseModel):
         if v is None:
             return v
         if not re.match(r'^[a-zA-Z0-9_-]{3,30}$', v):
-            raise ValueError('Slug must be 3-30 characters: letters, numbers, hyphens, underscores only')
+            raise ValueError(
+                'Slug must be 3-30 characters: letters, numbers, hyphens, underscores only')
         return v
 
 

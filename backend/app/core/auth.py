@@ -9,6 +9,7 @@ from app.models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+
 def require_api_key(
     x_api_key: str = Header(...),
     db: Session = Depends(get_db)
@@ -21,6 +22,7 @@ def require_api_key(
             headers={"WWW-Authenticate": "ApiKey"},
         )
     return api_key
+
 
 def get_current_user(
     token: str = Depends(oauth2_scheme),
@@ -35,8 +37,10 @@ def get_current_user(
         )
     user = auth_service.get_user_by_id(db, user_id)
     if not user or not user.is_active:
-        raise HTTPException(status_code=401, detail="User not found or inactive")
+        raise HTTPException(
+            status_code=401, detail="User not found or inactive")
     return user
+
 
 def get_current_admin(
     current_user: User = Depends(get_current_user)
@@ -48,8 +52,10 @@ def get_current_admin(
         )
     return current_user
 
+
 def get_optional_user(
-    token: str | None = Depends(OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)),
+    token: str | None = Depends(OAuth2PasswordBearer(
+        tokenUrl="/auth/login", auto_error=False)),
     db: Session = Depends(get_db)
 ) -> User | None:
     if not token:

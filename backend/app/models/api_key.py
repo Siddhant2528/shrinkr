@@ -3,6 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
+
 class APIKey(Base):
     __tablename__ = "api_keys"
 
@@ -13,4 +14,4 @@ class APIKey(Base):
     is_active = Column(Boolean, default=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
-    owner = relationship("User", back_populates="api_keys")
+    owner = relationship("User", back_populates="api_keys")

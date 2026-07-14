@@ -19,8 +19,10 @@ else:
         pool_size=5,           # Maintain up to 5 persistent connections
         max_overflow=10,       # Allow up to 10 extra connections under load
         pool_timeout=30,       # Wait max 30s for a connection before erroring
-        pool_recycle=1800,     # Recycle connections after 30 min (avoids stale connections)
-        pool_pre_ping=True,    # Test connections before use (handles DB restarts gracefully)
+        # Recycle connections after 30 min (avoids stale connections)
+        pool_recycle=1800,
+        # Test connections before use (handles DB restarts gracefully)
+        pool_pre_ping=True,
     )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

@@ -1,6 +1,7 @@
 import time
 from app.core.redis import redis_client
 
+
 def is_rate_limited(
     identifier: str,
     limit: int = 100,

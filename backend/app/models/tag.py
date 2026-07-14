@@ -6,8 +6,10 @@ from app.core.database import Base
 link_tags = Table(
     "link_tags",
     Base.metadata,
-    Column("link_id", Integer, ForeignKey("urls.id", ondelete="CASCADE"), primary_key=True),
-    Column("tag_id", Integer, ForeignKey("tags.id", ondelete="CASCADE"), primary_key=True),
+    Column("link_id", Integer, ForeignKey(
+        "urls.id", ondelete="CASCADE"), primary_key=True),
+    Column("tag_id", Integer, ForeignKey(
+        "tags.id", ondelete="CASCADE"), primary_key=True),
 )
 
 
