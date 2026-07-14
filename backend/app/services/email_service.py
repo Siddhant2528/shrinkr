@@ -15,41 +15,41 @@ def generate_otp() -> str:
 
 
 def send_email_sync(to_email: str, subject: str, html_content: str):
-    # ─── Resend HTTP API (Prioritized) ────────────────────────────────────────
-    if settings.RESEND_API_KEY:
+    # ─── Brevo HTTP API (Prioritized) ─────────────────────────────────────────
+    if settings.BREVO_API_KEY:
         try:
-            from_email = settings.SMTP_FROM or "onboarding@resend.dev"
-            from_header = f"{settings.APP_NAME} <{from_email}>"
+            from_email = settings.SMTP_FROM or "onboarding@brevo.com"
 
             response = requests.post(
-                "https://api.resend.com/emails",
+                "https://api.brevo.com/v3/smtp/email",
                 headers={
-                    "Authorization": f"Bearer {settings.RESEND_API_KEY}",
-                    "Content-Type": "application/json",
+                    "accept": "application/json",
+                    "api-key": settings.BREVO_API_KEY,
+                    "content-type": "application/json",
                 },
                 json={
-                    "from": from_header,
-                    "to": [to_email],
+                    "sender": {"name": settings.APP_NAME, "email": from_email},
+                    "to": [{"email": to_email}],
                     "subject": subject,
-                    "html": html_content,
+                    "htmlContent": html_content,
                 },
                 timeout=10,
             )
             if response.status_code >= 200 and response.status_code < 300:
                 logger.info(
-                    "Email sent successfully to %s via Resend API", to_email)
+                    "Email sent successfully to %s via Brevo API", to_email)
             else:
-                logger.error("Failed to send email to %s via Resend API: %s %s",
+                logger.error("Failed to send email to %s via Brevo API: %s %s",
                              to_email, response.status_code, response.text)
         except Exception as e:
             logger.error(
-                "Failed to send email to %s via Resend API: %s", to_email, e)
+                "Failed to send email to %s via Brevo API: %s", to_email, e)
         return
 
     # ─── Legacy SMTP Fallback ─────────────────────────────────────────────────
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
         logger.warning(
-            "Neither Resend nor SMTP credentials configured — skipping email to %s", to_email
+            "Neither Brevo nor SMTP credentials configured — skipping email to %s", to_email
         )
         return
 
