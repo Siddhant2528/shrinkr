@@ -1,6 +1,7 @@
 import smtplib
 import random
 import logging
+import requests
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from app.core.config import get_settings
@@ -14,9 +15,41 @@ def generate_otp() -> str:
 
 
 def send_email_sync(to_email: str, subject: str, html_content: str):
+    # ─── Resend HTTP API (Prioritized) ────────────────────────────────────────
+    if settings.RESEND_API_KEY:
+        try:
+            from_email = settings.SMTP_FROM or "onboarding@resend.dev"
+            from_header = f"{settings.APP_NAME} <{from_email}>"
+
+            response = requests.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "from": from_header,
+                    "to": [to_email],
+                    "subject": subject,
+                    "html": html_content,
+                },
+                timeout=10,
+            )
+            if response.status_code >= 200 and response.status_code < 300:
+                logger.info(
+                    "Email sent successfully to %s via Resend API", to_email)
+            else:
+                logger.error("Failed to send email to %s via Resend API: %s %s",
+                             to_email, response.status_code, response.text)
+        except Exception as e:
+            logger.error(
+                "Failed to send email to %s via Resend API: %s", to_email, e)
+        return
+
+    # ─── Legacy SMTP Fallback ─────────────────────────────────────────────────
     if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
         logger.warning(
-            "SMTP credentials not configured — skipping email to %s", to_email
+            "Neither Resend nor SMTP credentials configured — skipping email to %s", to_email
         )
         return
 

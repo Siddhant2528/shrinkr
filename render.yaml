@@ -43,3 +43,5 @@ services:
         sync: false
       - key: DEFAULT_ADMIN_PASSWORD
         sync: false
+      - key: RESEND_API_KEY
+        sync: false
