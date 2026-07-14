@@ -1,0 +1,527 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ─── Tailwind v4: enable dark mode via .dark class ────────────────────────── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary Colors */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+
+  /* Shrinkr Theme — light */
+  --color-shrinkr-bg: #F8FAFC;
+  --color-shrinkr-card: #FFFFFF;
+  --color-shrinkr-border: #E2E8F0;
+  --color-shrinkr-text: #0F172A;
+  --color-shrinkr-muted: #64748B;
+  --color-shrinkr-accent: #3B82F6;
+  --color-shrinkr-hover: #2563EB;
+  --color-shrinkr-success: #10B981;
+  --color-shrinkr-warning: #F59E0B;
+  --color-shrinkr-danger: #EF4444;
+
+  /* Typography */
+  --font-sans: "Inter", sans-serif;
+
+  /* Border Radius */
+  --radius-xl: 12px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Prevent white flash during dark mode route transitions */
+    background-color: #F8FAFC;
+  }
+
+  .dark html {
+    background-color: #09090B;
+  }
+
+  body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+    font-family: "Inter", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* No transition on bg-color to eliminate flash — color transitions only */
+    transition: color 0.2s ease;
+  }
+
+  /* ── Dark mode body overrides ── */
+  .dark body {
+    background-color: #09090B;
+    color: #FFFFFF;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  :focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+
+  /* ==========================
+     Buttons
+     ========================== */
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-200 font-medium hover:bg-gray-50 active:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-50 text-red-600 font-medium hover:bg-red-100 active:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* ==========================
+     Cards
+     ========================== */
+
+  .card {
+    @apply bg-white rounded-xl border border-gray-100 shadow-sm;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.18s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08), 0 2px 8px -2px rgba(15, 23, 42, 0.04) !important;
+  }
+
+  /* Opt-out of hover lift for interactive input cards */
+  .card-static,
+  .card-static:hover {
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+    border-color: inherit !important;
+  }
+
+  /* ==========================
+     Form Elements
+     ========================== */
+
+  .input {
+    @apply w-full px-4 py-3 rounded-lg border border-gray-200 text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-50 disabled:text-gray-400;
+  }
+
+  .label {
+    @apply block mb-1.5 text-sm font-medium text-gray-700;
+  }
+
+  /* ==========================
+     Badges
+     ========================== */
+
+  .badge-active {
+    @apply px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700;
+  }
+
+  .badge-inactive {
+    @apply px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700;
+  }
+
+  .badge-archived {
+    @apply px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500;
+  }
+
+  /* ==========================
+     Page Headers
+     ========================== */
+
+  .page-header {
+    @apply mb-6;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-gray-900;
+  }
+
+  .page-subtitle {
+    @apply mt-1 text-sm text-gray-500;
+  }
+}
+
+/* ==============================================================================
+   PREMIUM DARK MODE GLOBAL STYLE OVERRIDES
+   ============================================================================== */
+.dark {
+  --color-shrinkr-bg: #09090B;
+  --color-shrinkr-card: #18181B;
+  --color-shrinkr-border: #27272A;
+  --color-shrinkr-text: #FFFFFF;
+  --color-shrinkr-muted: #A1A1AA;
+
+  /* ── Standard Components ── */
+  .card {
+    background-color: #18181B !important;
+    border-color: #27272A !important;
+  }
+
+  .input {
+    background-color: #101014 !important;
+    border-color: #27272A !important;
+    color: #FFFFFF !important;
+  }
+  .input::placeholder {
+    color: #A1A1AA !important;
+  }
+
+  .label {
+    color: #A1A1AA !important;
+  }
+
+  .btn-secondary {
+    background-color: #18181B !important;
+    color: #FFFFFF !important;
+    border-color: #27272A !important;
+  }
+  .btn-secondary:hover {
+    background-color: #27272A !important;
+  }
+
+  .btn-danger {
+    background-color: #3B0707 !important;
+    color: #FCA5A5 !important;
+  }
+  .btn-danger:hover {
+    background-color: #7F1D1D !important;
+  }
+
+  .badge-active {
+    background-color: #064E3B !important;
+    color: #6EE7B7 !important;
+  }
+  .badge-inactive {
+    background-color: #7F1D1D !important;
+    color: #FCA5A5 !important;
+  }
+  .badge-archived {
+    background-color: #27272A !important;
+    color: #A1A1AA !important;
+  }
+
+  .page-title {
+    color: #FFFFFF !important;
+  }
+  .page-subtitle {
+    color: #A1A1AA !important;
+  }
+
+  /* ── Hardcoded layout text/color mapping ── */
+  .bg-white {
+    background-color: #18181B !important;
+  }
+  .bg-gray-50 {
+    background-color: #09090B !important;
+  }
+  .border-gray-50,
+  .border-gray-100,
+  .border-gray-200 {
+    border-color: #27272A !important;
+  }
+  
+  .text-gray-900 {
+    color: #FFFFFF !important;
+  }
+  .text-gray-800 {
+    color: #FFFFFF !important;
+  }
+  .text-gray-700 {
+    color: #E2E8F0 !important;
+  }
+  .text-gray-600 {
+    color: #A1A1AA !important;
+  }
+  .text-gray-500 {
+    color: #A1A1AA !important;
+  }
+  .text-gray-400 {
+    color: #71717A !important;
+  }
+
+  /* Interactive / hover states */
+  .hover\:bg-gray-50:hover {
+    background-color: #18181B !important;
+  }
+  .hover\:bg-gray-50\/50:hover {
+    background-color: rgba(24, 24, 27, 0.5) !important;
+  }
+  
+  /* Tables & Lists */
+  table thead tr {
+    background-color: #101014 !important;
+    border-bottom-color: #27272A !important;
+  }
+  table tbody tr {
+    border-bottom-color: #27272A !important;
+  }
+  table tbody tr:hover {
+    background-color: rgba(24, 24, 27, 0.4) !important;
+  }
+
+  /* Select dropdowns */
+  select {
+    background-color: #18181B !important;
+    color: #FFFFFF !important;
+    border-color: #27272A !important;
+  }
+  select option {
+    background-color: #101014 !important;
+    color: #FFFFFF !important;
+  }
+
+  /* Navigation elements */
+  nav {
+    background-color: #101014 !important;
+    border-color: #27272A !important;
+  }
+
+  /* Feature and badge background overlays */
+  .bg-blue-50 {
+    background-color: rgba(37, 99, 235, 0.15) !important;
+    color: #3b82f6 !important;
+  }
+  .bg-yellow-50 {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+    color: #f59e0b !important;
+  }
+  .bg-green-50 {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: #10b981 !important;
+  }
+  .bg-purple-50 {
+    background-color: rgba(139, 92, 246, 0.15) !important;
+    color: #8b5cf6 !important;
+  }
+  .bg-red-50 {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    color: #ef4444 !important;
+  }
+  .bg-orange-50 {
+    background-color: rgba(249, 115, 22, 0.15) !important;
+    color: #f97316 !important;
+  }
+  
+  .text-blue-700 {
+    color: #3b82f6 !important;
+  }
+  .text-blue-600 {
+    color: #3b82f6 !important;
+  }
+  .border-blue-100 {
+    border-color: rgba(37, 99, 235, 0.25) !important;
+  }
+
+  /* Alert text overrides */
+  .text-red-600 {
+    color: #f87171 !important;
+  }
+  .text-red-500 {
+    color: #ef4444 !important;
+  }
+  .text-green-700 {
+    color: #34d399 !important;
+  }
+  
+  .border-green-200 {
+    border-color: rgba(16, 185, 129, 0.25) !important;
+  }
+  .border-red-100 {
+    border-color: rgba(239, 68, 68, 0.25) !important;
+  }
+
+  /* ── DashboardLayout Sidebar & Header (uses slate-* Tailwind classes) ── */
+  .dark\:bg-slate-900 {
+    background-color: #09090B !important;
+  }
+  .dark\:bg-slate-800 {
+    background-color: #18181B !important;
+  }
+  .dark\:border-slate-700 {
+    border-color: #27272A !important;
+  }
+  .dark\:border-slate-600 {
+    border-color: #3F3F46 !important;
+  }
+  .dark\:text-slate-100 {
+    color: #FFFFFF !important;
+  }
+  .dark\:text-slate-300 {
+    color: #D4D4D8 !important;
+  }
+  .dark\:text-slate-400 {
+    color: #A1A1AA !important;
+  }
+  .dark\:text-slate-500 {
+    color: #71717A !important;
+  }
+  .dark\:bg-slate-700 {
+    background-color: #27272A !important;
+  }
+  .dark\:hover\:bg-slate-700:hover {
+    background-color: #27272A !important;
+  }
+  .dark\:hover\:text-slate-100:hover {
+    color: #FFFFFF !important;
+  }
+  .dark\:hover\:text-slate-300:hover {
+    color: #D4D4D8 !important;
+  }
+  .dark\:bg-blue-950 {
+    background-color: rgba(30, 58, 138, 0.2) !important;
+  }
+  .dark\:text-blue-400 {
+    color: #60a5fa !important;
+  }
+  .dark\:bg-red-950 {
+    background-color: rgba(127, 29, 29, 0.3) !important;
+  }
+  .dark\:hover\:text-red-400:hover {
+    color: #f87171 !important;
+  }
+
+  /* ── DashboardNav tab underline ── */
+  .dark .border-gray-200 {
+    border-color: #27272A !important;
+  }
+  .dark .hover\:text-gray-700:hover {
+    color: #D4D4D8 !important;
+  }
+  .dark .hover\:border-gray-300:hover {
+    border-color: #52525B !important;
+  }
+
+  /* ── Card hover in dark mode ── */
+  .card:hover {
+    border-color: rgba(59, 130, 246, 0.35) !important;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  /* ── Prevent row table hover override from conflicting with card hover ── */
+  table tbody tr:hover {
+    background-color: #1F1F23 !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+/* ==============================================================================
+   TABLE ENHANCEMENTS & PREMIUM HOVER LIFT
+   ============================================================================== */
+table tbody tr {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+table tbody tr:hover {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 4px -1px rgba(15, 23, 42, 0.03) !important;
+  transform: translateY(-1.5px);
+  position: relative;
+  z-index: 10;
+}
+
+.dark table tbody tr:hover {
+  background-color: #1F1F23 !important; /* slightly brighter than #18181B card */
+  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Increase row height globally on all table cells */
+table tbody tr td {
+  padding-top: 1.25rem !important; /* py-5 = 20px (8px taller overall than py-4) */
+  padding-bottom: 1.25rem !important;
+}
+
+/* ==============================================================================
+   PREMIUM CSS TOOLTIPS
+   ============================================================================== */
+.tooltip-trigger {
+  position: relative;
+}
+
+.tooltip-trigger::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background-color: #0F172A;
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.375rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.15), 0 2px 4px -1px rgba(15, 23, 42, 0.1);
+  z-index: 9999;
+}
+
+.tooltip-trigger::before {
+  content: '';
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #0F172A transparent transparent transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9999;
+}
+
+.dark .tooltip-trigger::after {
+  background-color: #27272A;
+  color: #FFFFFF;
+  border: 1px solid #3F3F46;
+}
+
+.dark .tooltip-trigger::before {
+  border-color: #27272A transparent transparent transparent;
+}
+
+.tooltip-trigger:hover::after,
+.tooltip-trigger:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==============================================================================
+   ANIMATIONS
+   ============================================================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

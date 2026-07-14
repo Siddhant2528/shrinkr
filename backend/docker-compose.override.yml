@@ -1,0 +1,20 @@
+# docker-compose.override.yml — LOCAL DEVELOPMENT ONLY
+# This file is automatically merged by docker-compose when present.
+# It re-exposes ports and enables debug mode for local development.
+# DO NOT deploy this file to production.
+
+services:
+  db:
+    ports:
+      - "5433:5432"  # Expose so you can connect with DBeaver / psql locally
+
+  app:
+    environment:
+      DEBUG: "True"
+      LOG_LEVEL: "DEBUG"
+    volumes:
+      - .:/app  # Live-reload: mount source code into the container
+
+  redis:
+    ports:
+      - "6379:6379"  # Expose so you can inspect Redis with redis-cli locally
