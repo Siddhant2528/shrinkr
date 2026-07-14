@@ -13,7 +13,7 @@ export default function AnalyticsIndexPage() {
         const fetchLinks = async () => {
             try {
                 const data = await urlApi.myLinks()
-                setLinks(Array.isArray(data) ? data : [])
+                setLinks(data && Array.isArray(data.items) ? data.items : [])
             } catch (err) {
                 console.error(err)
             } finally {
