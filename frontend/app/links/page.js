@@ -139,7 +139,11 @@ export default function LinksPage() {
             // Also sync tags
             if (editTagIds !== null) {
                 const { tagApi: tApi } = await import("@/lib/api")
-                await tApi.setLinkTags(editingLink.short_code, editTagIds)
+                const tagRes = await tApi.setLinkTags(editingLink.short_code, editTagIds)
+                if (tagRes && tagRes.detail) {
+                    showToast(tagRes.detail, "error")
+                    return
+                }
             }
 
             await fetchLinks()

@@ -100,7 +100,7 @@ def health():
     return {"status": "ok", "app": settings.APP_NAME}
 
 
-app.include_router(url_router.router, tags=["URLs"])
 app.include_router(auth_router.router)
 app.include_router(tags_router.router)
 app.include_router(domains_router.router)
+app.include_router(url_router.router, tags=["URLs"])

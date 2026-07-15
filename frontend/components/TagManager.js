@@ -47,6 +47,9 @@ export default function TagManager({ selectedIds = [], onSelectionChange, showCr
             const tag = await tagApi.create(newName.trim(), newColor)
             if (tag.id) {
                 setTags(prev => [...prev, tag])
+                if (onSelectionChange) {
+                    onSelectionChange([...selectedIds, tag.id])
+                }
                 setNewName("")
                 setShowForm(false)
             }
@@ -108,15 +111,13 @@ export default function TagManager({ selectedIds = [], onSelectionChange, showCr
                         >
                             <Tag size={10} />
                             <span>{tag.name}</span>
-                            {onSelectionChange === undefined && (
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); handleDelete(tag.id) }}
-                                    className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                                    title="Delete tag"
-                                >
-                                    <X size={10} />
-                                </button>
-                            )}
+                            <button
+                                onClick={(e) => { e.stopPropagation(); handleDelete(tag.id) }}
+                                className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
+                                title="Delete tag"
+                            >
+                                <X size={10} />
+                            </button>
                         </div>
                     )
                 })}
