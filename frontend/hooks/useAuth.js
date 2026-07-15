@@ -37,9 +37,8 @@ export function useAuth(redirectTo = "/login") {
         }
     }
 
-    const initialUser = getInitialUser()
-    const [user, setUser] = useState(initialUser)
-    const [isLoading, setIsLoading] = useState(!initialUser)
+    const [user, setUser] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
     const router = useRouter()
 
     // Schedule a proactive token refresh before expiry
@@ -126,10 +125,7 @@ export function useAuth(redirectTo = "/login") {
 }
 
 export function useGuest(redirectTo = "/dashboard") {
-    const [isLoading, setIsLoading] = useState(() => {
-        if (typeof window === "undefined") return true
-        return !!localStorage.getItem("token")
-    })
+    const [isLoading, setIsLoading] = useState(true)
     const router = useRouter()
 
     useEffect(() => {
