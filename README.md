@@ -159,17 +159,19 @@ end
 
 ---
 
-# 📸 Screenshots
+## 📸 Screenshots
 
-- `home.png` — Landing page
-- `dashboard.png` — URL shortener dashboard
-- `analytics.png` — Analytics dashboard
-- `qr-code.png` — QR code generation
-- `swagger.png` — Swagger documentation
-- `ci.png` — CI pipeline run
-- `load-testing.png` — load testing report
+| Landing Page | Dashboard |
+|---------------|-----------|
+| ![](screenshots/home.png) | ![](screenshots/dashboard.png) |
 
----
+| Analytics | QR Code |
+|------------|---------|
+| ![](screenshots/analytics.png) | ![](screenshots/qr-code.png) |
+
+| Swagger | CI Pipeline |
+|----------|-------------|
+| ![](screenshots/swagger.png) | ![](screenshots/ci.png) |
 
 # 📂 Project Structure
 
