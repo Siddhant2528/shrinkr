@@ -23,7 +23,6 @@ class TagResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-
 class SetTagsRequest(BaseModel):
     tag_ids: list[int]
 

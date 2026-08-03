@@ -28,7 +28,6 @@ class DomainResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-
 @router.post("", response_model=DomainResponse, status_code=201)
 def add_domain(
     data: DomainCreate,
