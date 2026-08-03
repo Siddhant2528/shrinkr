@@ -22,3 +22,9 @@ yarn-error.log*
 .env.*
 !.env.example
 *.pem
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+

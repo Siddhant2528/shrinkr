@@ -1,6 +1,9 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback } from "react"
+import { formatErrorMessage } from "../lib/errorUtils"
+
+export { formatErrorMessage }
 
 const ToastContext = createContext(null)
 
@@ -9,7 +12,8 @@ export function ToastProvider({ children }) {
 
     const showToast = useCallback((message, type = "success") => {
         const id = Date.now()
-        setToasts((prev) => [...prev, { id, message, type }])
+        const cleanMessage = formatErrorMessage(message)
+        setToasts((prev) => [...prev, { id, message: cleanMessage, type }])
         
         // Auto dismiss after 4 seconds
         setTimeout(() => {

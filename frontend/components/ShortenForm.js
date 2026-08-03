@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { urlApi } from "@/lib/api"
-import { useToast } from "@/hooks/useToast"
+import { useToast, formatErrorMessage } from "@/hooks/useToast"
 
 export default function ShortenForm() {
     const [url, setUrl] = useState("")
@@ -30,16 +30,22 @@ export default function ShortenForm() {
         setShowQr(false)
         setIsLoading(true)
 
+        let targetUrl = url.trim()
+        if (targetUrl && !/^https?:\/\//i.test(targetUrl)) {
+            targetUrl = `https://${targetUrl}`
+        }
+
         try {
             const data = await urlApi.shorten(
-                url,
+                targetUrl,
                 customSlug || null,
                 expiryDays ? parseInt(expiryDays) : null
             )
 
             if (data.detail) {
-                setError(data.detail)
-                showToast(data.detail, "error")
+                const errMsg = formatErrorMessage(data.detail)
+                setError(errMsg)
+                showToast(errMsg, "error")
                 return
             }
 
