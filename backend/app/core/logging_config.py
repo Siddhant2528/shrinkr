@@ -1,11 +1,71 @@
 """
 Structured logging configuration for Shrinkr.
 
-In production (DEBUG=False):  JSON-like structured output, level=INFO
+In production (DEBUG=False):  Fully structured JSON output, level=INFO
+                               Each log line is a single JSON object with:
+                               - timestamp (ISO-8601 UTC)
+                               - level, logger, message
+                               - filename, lineno
+                               - exc_info (full traceback, when present)
+                               - any extra fields passed at call sites
+
 In development  (DEBUG=True): Human-readable coloured output, level=DEBUG
 """
+import json
 import logging
 import sys
+import traceback
+from datetime import datetime, timezone
+
+
+class JSONFormatter(logging.Formatter):
+    """
+    Formats each log record as a single-line JSON object suitable for
+    ingestion by Datadog, AWS CloudWatch, the ELK stack, Papertrail, etc.
+    """
+
+    # Keys from LogRecord that we explicitly handle ourselves.
+    # Everything else in record.__dict__ that isn't in this set gets
+    # forwarded verbatim as an "extra" field — handy for structured context
+    # added with logger.info("…", extra={"user_id": 42, "path": "/shorten"}).
+    _BUILTIN_KEYS = frozenset({
+        "args", "created", "exc_info", "exc_text", "filename",
+        "funcName", "levelname", "levelno", "lineno", "message",
+        "module", "msecs", "msg", "name", "pathname", "process",
+        "processName", "relativeCreated", "stack_info", "taskName",
+        "thread", "threadName",
+    })
+
+    def format(self, record: logging.LogRecord) -> str:
+        record.message = record.getMessage()
+
+        payload: dict = {
+            "timestamp": datetime.fromtimestamp(
+                record.created, tz=timezone.utc
+            ).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.message,
+            "filename": record.filename,
+            "lineno": record.lineno,
+        }
+
+        # Attach full exception traceback when present
+        if record.exc_info and record.exc_info[0] is not None:
+            payload["exc_info"] = "".join(
+                traceback.format_exception(*record.exc_info)
+            ).rstrip()
+
+        # Forward any user-supplied extra fields
+        for key, value in record.__dict__.items():
+            if key not in self._BUILTIN_KEYS and not key.startswith("_"):
+                try:
+                    json.dumps(value)   # guard: only serialisable values
+                    payload[key] = value
+                except (TypeError, ValueError):
+                    payload[key] = repr(value)
+
+        return json.dumps(payload, ensure_ascii=False)
 
 
 def setup_logging(debug: bool = False, log_level: str = "INFO") -> None:
@@ -16,13 +76,12 @@ def setup_logging(debug: bool = False, log_level: str = "INFO") -> None:
     if debug:
         fmt = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
         datefmt = "%H:%M:%S"
+        formatter: logging.Formatter = logging.Formatter(fmt, datefmt=datefmt)
     else:
-        # Structured-ish format that log aggregators (Datadog, Papertrail, etc.) can parse
-        fmt = '{"time":"%(asctime)s","level":"%(levelname)s","logger":"%(name)s","message":"%(message)s"}'
-        datefmt = "%Y-%m-%dT%H:%M:%S"
+        formatter = JSONFormatter()
 
     handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(logging.Formatter(fmt, datefmt=datefmt))
+    handler.setFormatter(formatter)
 
     root = logging.getLogger()
     root.setLevel(level)

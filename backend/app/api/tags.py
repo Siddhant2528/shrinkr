@@ -5,7 +5,7 @@ from app.core.auth import get_current_user
 from app.models.user import User
 from app.services import tag_service
 from app.models.url import URL
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 router = APIRouter(prefix="/tags", tags=["Tags"])
 
@@ -20,8 +20,8 @@ class TagResponse(BaseModel):
     name: str
     color: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
 
 
 class SetTagsRequest(BaseModel):

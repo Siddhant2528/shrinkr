@@ -14,7 +14,7 @@ class CustomDomain(Base):
     __tablename__ = "custom_domains"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     domain = Column(String, unique=True, nullable=False, index=True)
     verification_token = Column(String, nullable=False)
     verification_type = Column(

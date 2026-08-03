@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl, field_validator
+from pydantic import BaseModel, HttpUrl, field_validator, ConfigDict
 from typing import Dict, Optional, List
 from datetime import datetime
 import re
@@ -11,8 +11,7 @@ class TagResponse(BaseModel):
     name: str
     color: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ─── URL schemas ──────────────────────────────────────────────────────────────
@@ -39,8 +38,7 @@ class URLResponse(BaseModel):
     short_url: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class URLListResponse(BaseModel):
@@ -56,8 +54,7 @@ class URLListResponse(BaseModel):
     expires_at: datetime | None
     tags: List[TagResponse] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PaginatedURLResponse(BaseModel):
@@ -99,8 +96,7 @@ class APIKeyResponse(BaseModel):
     key: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class APIKeyListResponse(BaseModel):
@@ -109,8 +105,7 @@ class APIKeyListResponse(BaseModel):
     is_active: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ─── Dashboard schemas ────────────────────────────────────────────────────────
@@ -121,8 +116,7 @@ class TopLink(BaseModel):
     clicks: int
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class RecentClick(BaseModel):
@@ -164,8 +158,7 @@ class UserResponse(BaseModel):
     is_verified: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TokenResponse(BaseModel):

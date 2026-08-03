@@ -17,6 +17,7 @@ from app.services import (
 from app.models.url import URL
 from datetime import datetime, timezone
 from app.core.auth import require_api_key, get_current_user, get_current_admin, get_optional_user
+from app.core.network import get_client_ip
 from app.models.api_key import APIKey as APIKeyModel
 from app.models.user import User
 
@@ -413,7 +414,7 @@ def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get
         click_service.record_click(
             db,
             url_id=cached["url_id"],
-            ip_address=request.client.host,
+            ip_address=get_client_ip(request),
             user_agent=request.headers.get("user-agent"),
             referer=request.headers.get("referer"),
         )
@@ -439,7 +440,7 @@ def redirect_to_url(short_code: str, request: Request, db: Session = Depends(get
     click_service.record_click(
         db,
         url_id=url_obj.id,
-        ip_address=request.client.host,
+        ip_address=get_client_ip(request),
         user_agent=request.headers.get("user-agent"),
         referer=request.headers.get("referer"),
     )

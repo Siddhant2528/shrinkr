@@ -8,13 +8,13 @@ class Click(Base):
     __tablename__ = "clicks"
 
     id = Column(Integer, primary_key=True, index=True)
-    url_id = Column(Integer, ForeignKey("urls.id"), nullable=False)
+    url_id = Column(Integer, ForeignKey("urls.id"), nullable=False, index=True)
     ip_address = Column(String, nullable=True)
     user_agent = Column(String, nullable=True)
     referer = Column(String, nullable=True)
     country = Column(String, nullable=True)
     device = Column(String, nullable=True)
     browser = Column(String, nullable=True)
-    clicked_at = Column(DateTime(timezone=True), server_default=func.now())
+    clicked_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
 
     url = relationship("URL", back_populates="click_events")

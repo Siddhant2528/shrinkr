@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar"
 import ShortenForm from "@/components/ShortenForm"
 import Link from "next/link"
+import { Zap, Database, Code2, Sparkles } from "lucide-react"
 
 const features = [
     {
@@ -42,10 +43,10 @@ const features = [
 ]
 
 const stats = [
-    { value: "< 5ms", label: "Redirect latency" },
-    { value: "Redis", label: "Cache layer" },
-    { value: "20+", label: "API endpoints" },
-    { value: "Free", label: "Always" },
+    { value: "< 5ms", label: "Redirect latency", icon: Zap, color: "text-amber-500 bg-amber-50 dark:bg-amber-950/20" },
+    { value: "Redis", label: "Cache layer", icon: Database, color: "text-red-500 bg-red-50 dark:bg-red-950/20" },
+    { value: "20+", label: "API endpoints", icon: Code2, color: "text-blue-500 bg-blue-50 dark:bg-blue-950/20" },
+    { value: "Free", label: "Always", icon: Sparkles, color: "text-emerald-500 bg-emerald-50 dark:bg-emerald-950/20" },
 ]
 
 export default function HomePage() {
@@ -56,17 +57,11 @@ export default function HomePage() {
             <main>
 
                 {/* Hero section */}
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-                    <div className="text-center max-w-3xl mx-auto mb-12">
-
-                        {/* Badge */}
-                        <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-blue-100">
-                            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"/>
-                            Production-ready URL Shortener
-                        </div>
+                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-10">
+                    <div className="text-center max-w-3xl mx-auto mb-8">
 
                         {/* Heading */}
-                        <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
+                        <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-4 leading-tight tracking-tight">
                             Shorten URLs.{" "}
                             <br />
                             <span className="text-blue-600">
@@ -75,7 +70,7 @@ export default function HomePage() {
                         </h1>
 
                         {/* Subtitle */}
-                        <p className="text-lg text-gray-500 mb-10 leading-relaxed max-w-2xl mx-auto">
+                        <p className="text-lg text-gray-500 mb-6 leading-relaxed max-w-2xl mx-auto">
                             A developer-focused URL shortener with real-time analytics,
                             geo tracking, QR codes, and Redis caching.
                             Built with FastAPI and PostgreSQL.
@@ -91,24 +86,30 @@ export default function HomePage() {
                     </div>
 
                     {/* Stats row */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 max-w-2xl mx-auto">
-                        {stats.map((stat) => (
-                            <div key={stat.label} className="text-center">
-                                <p className="text-2xl font-bold text-gray-900">
-                                    {stat.value}
-                                </p>
-                                <p className="text-sm text-gray-400 mt-1">
-                                    {stat.label}
-                                </p>
-                            </div>
-                        ))}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10 max-w-2xl mx-auto">
+                        {stats.map((stat) => {
+                            const IconComponent = stat.icon
+                            return (
+                                <div key={stat.label} className="text-center flex flex-col items-center">
+                                    <div className={`p-2 rounded-xl mb-2 flex items-center justify-center ${stat.color}`}>
+                                        <IconComponent size={20} />
+                                    </div>
+                                    <p className="text-2xl font-bold text-gray-900">
+                                        {stat.value}
+                                    </p>
+                                    <p className="text-sm text-gray-400 mt-1">
+                                        {stat.label}
+                                    </p>
+                                </div>
+                            )
+                        })}
                     </div>
 
                 </section>
 
                 {/* Features grid */}
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-gray-100">
-                    <div className="text-center mb-12">
+                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-gray-100">
+                    <div className="text-center mb-8">
                         <h2 className="text-3xl font-bold text-gray-900 mb-4">
                             Everything you need
                         </h2>
@@ -137,7 +138,7 @@ export default function HomePage() {
                 </section>
 
                 {/* CTA section */}
-                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     <div className="bg-blue-600 rounded-2xl p-12 text-center">
                         <h2 className="text-3xl font-bold text-white mb-4">
                             Ready to get started?

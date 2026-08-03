@@ -1,7 +1,40 @@
+import time
+import logging
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from app.services.rate_limiter import is_rate_limited
 from app.services.cache_service import get_cached_domain
+from app.core.network import get_client_ip
+
+_access_logger = logging.getLogger("shrinkr.access")
+
+
+async def structured_logging_middleware(request: Request, call_next):
+    """
+    Logs every inbound request and its response as a structured record.
+
+    Extra fields emitted (visible as JSON keys in production):
+        method, path, status_code, processing_time_ms, client_ip, user_agent
+    """
+    start = time.perf_counter()
+    response = await call_next(request)
+    elapsed_ms = round((time.perf_counter() - start) * 1000, 2)
+
+    _access_logger.info(
+        "%s %s %s",
+        request.method,
+        request.url.path,
+        response.status_code,
+        extra={
+            "method": request.method,
+            "path": request.url.path,
+            "status_code": response.status_code,
+            "processing_time_ms": elapsed_ms,
+            "client_ip": get_client_ip(request),
+            "user_agent": request.headers.get("user-agent"),
+        },
+    )
+    return response
 
 
 # Primary app hostname — requests from this host skip custom-domain resolution
@@ -15,7 +48,7 @@ def init_primary_host(host: str) -> None:
 
 async def rate_limit_middleware(request: Request, call_next):
     if request.url.path.startswith("/shorten") or request.url.path.startswith("/api-keys"):
-        client_ip = request.client.host
+        client_ip = get_client_ip(request)
         api_key = request.headers.get("x-api-key")
 
         identifier = f"apikey:{api_key}" if api_key else f"ip:{client_ip}"

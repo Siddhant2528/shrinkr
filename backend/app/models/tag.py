@@ -19,7 +19,7 @@ class Tag(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     color = Column(String, default="#6366f1")  # hex colour
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
 
     owner = relationship("User", back_populates="tags")
     urls = relationship("URL", secondary=link_tags, back_populates="tags")

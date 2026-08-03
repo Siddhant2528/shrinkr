@@ -5,7 +5,7 @@ from app.core.auth import get_current_user
 from app.models.user import User
 from app.models.custom_domain import CustomDomain, VerificationType
 from app.services import domain_service
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 router = APIRouter(prefix="/domains", tags=["Custom Domains"])
@@ -25,8 +25,8 @@ class DomainResponse(BaseModel):
     created_at: datetime
     verified_at: datetime | None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
 
 
 @router.post("", response_model=DomainResponse, status_code=201)

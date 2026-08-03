@@ -5,7 +5,7 @@ from app.api import url as url_router
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from app.core.middleware import rate_limit_middleware, custom_domain_middleware, init_primary_host
+from app.core.middleware import rate_limit_middleware, custom_domain_middleware, init_primary_host, structured_logging_middleware
 from app.api import auth as auth_router
 from app.api import tags as tags_router
 from app.api import domains as domains_router
@@ -24,7 +24,7 @@ try:
 except Exception:
     pass
 
-# ─── FastAPI app ──────────────────────────────────────────────────────────────
+# ─── FastAPI app ───
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -36,7 +36,7 @@ app = FastAPI(
     openapi_url="/openapi.json" if settings.DEBUG else None,
 )
 
-# ─── Security headers middleware ──────────────────────────────────────────────
+# ─── Security headers middleware ───────
 
 
 @app.middleware("http")
@@ -49,7 +49,14 @@ async def add_security_headers(request: Request, call_next):
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     return response
 
-# ─── Custom domain middleware runs first (outermost) ─────────────────────────
+# ─── Structured request/response logging (outermost — wraps everything) ──────
+
+app.add_middleware(
+    BaseHTTPMiddleware,
+    dispatch=structured_logging_middleware,
+)
+
+# ─── Custom domain middleware runs first (outermost) ───
 
 app.add_middleware(
     BaseHTTPMiddleware,
@@ -61,7 +68,7 @@ app.add_middleware(
     dispatch=rate_limit_middleware,
 )
 
-# ─── CORS ────────────────────────────────────────────────────────────────────
+# ─── CORS ───
 
 # Always allow the configured FRONTEND_URL.
 # In dev (DEBUG=True) also allow localhost variants for convenience.
@@ -87,7 +94,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Routes ──────────────────────────────────────────────────────────────────
+# ─── Routes ────
 
 
 @app.get("/")
