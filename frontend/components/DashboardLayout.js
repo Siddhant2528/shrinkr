@@ -98,7 +98,7 @@ export default function DashboardLayout({ children }) {
                     {/* Divider */}
                     <div className="pt-2 mt-2 border-t border-gray-100 dark:border-zinc-800">
                         <a
-                            href="https://shrinkr-api.onrender.com/docs"
+                            href="https://shrinkr-w57o.onrender.com/docs"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
