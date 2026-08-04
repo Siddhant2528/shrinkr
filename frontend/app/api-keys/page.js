@@ -170,7 +170,7 @@ export default function ApiKeysPage() {
                             <div className="text-xs text-amber-600 space-y-0.5">
                                 <p>Name: <span className="font-semibold">{newKey.name}</span></p>
                                 <p>Created: <span className="font-semibold">
-                                    {new Date(newKey.created_at).toLocaleString()}
+                                    {new Date(newKey.created_at).toLocaleDateString("en-GB")}
                                 </span></p>
                             </div>
                             <button
@@ -258,11 +258,7 @@ export default function ApiKeysPage() {
                                             </span>
                                         </div>
                                         <p className="text-xs text-gray-400 mt-1">
-                                            Created {new Date(key.created_at).toLocaleDateString("en-US", {
-                                                month: "short",
-                                                day: "numeric",
-                                                year: "numeric",
-                                            })}
+                                            Created {new Date(key.created_at).toLocaleDateString("en-GB")}
                                         </p>
                                     </div>
                                     <button
@@ -298,11 +294,7 @@ export default function ApiKeysPage() {
                                                     </span>
                                                 </div>
                                                 <p className="text-xs text-gray-400 mt-1">
-                                                    Created {new Date(key.created_at).toLocaleDateString("en-US", {
-                                                        month: "short",
-                                                        day: "numeric",
-                                                        year: "numeric",
-                                                    })}
+                                                    Created {new Date(key.created_at).toLocaleDateString("en-GB")}
                                                 </p>
                                             </div>
                                         </div>

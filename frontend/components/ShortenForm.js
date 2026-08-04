@@ -224,7 +224,7 @@ export default function ShortenForm() {
                                 ✅ Link shortened successfully
                             </p>
                             <span className="text-xs text-gray-400">
-                                {new Date(result.created_at).toLocaleDateString()}
+                                {new Date(result.created_at).toLocaleDateString("en-GB")}
                             </span>
                         </div>
 

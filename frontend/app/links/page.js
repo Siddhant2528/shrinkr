@@ -395,7 +395,7 @@ export default function LinksPage() {
 
                                             {/* Created */}
                                             <td className="px-6 py-5 hidden lg:table-cell text-sm text-gray-500 dark:text-slate-500">
-                                                {new Date(link.created_at).toLocaleDateString()}
+                                                {new Date(link.created_at).toLocaleDateString("en-GB")}
                                             </td>
 
                                             {/* Actions */}

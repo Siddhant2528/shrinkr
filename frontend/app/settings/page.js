@@ -165,11 +165,7 @@ export default function SettingsPage() {
                             <p className="text-xs text-gray-400 mb-1">Member since</p>
                             <p className="text-sm font-medium text-gray-900">
                                 {user?.created_at
-                                    ? new Date(user.created_at).toLocaleDateString("en-US", {
-                                        month: "long",
-                                        day: "numeric",
-                                        year: "numeric"
-                                    })
+                                    ? new Date(user.created_at).toLocaleDateString("en-GB")
                                     : "—"}
                             </p>
                         </div>
